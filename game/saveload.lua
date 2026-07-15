@@ -98,13 +98,49 @@ savevalue='"..savevalue.."'"
 end
 
 function loadgame(x)
-	local file
-	if x == 'autoload' then
-		file = love.filesystem.load("save-autoload.sav")
-	else
-		file = love.filesystem.load("save"..savenumber.."-"..persistent.ptr..".sav")
-	end
-	pcall(file)
+    local filename
+
+    if x == 'autoload' then
+        filename = "save-autoload.sav"
+    else
+        filename = "save"..savenumber.."-"..persistent.ptr..".sav"
+    end
+
+    local file, loadError = love.filesystem.load(filename)
+
+    if not file then
+        love.filesystem.write(
+            "save-debug.txt",
+            "FAILED TO COMPILE SAVE\n"..
+            "File: "..tostring(filename).."\n"..
+            "Error: "..tostring(loadError)
+        )
+
+        return false
+    end
+
+    local success, runtimeError = pcall(file)
+
+    if not success then
+        love.filesystem.write(
+            "save-debug.txt",
+            "FAILED TO EXECUTE SAVE\n"..
+            "File: "..tostring(filename).."\n"..
+            "Error: "..tostring(runtimeError)
+        )
+
+        return false
+    end
+
+    love.filesystem.write(
+        "save-debug.txt",
+        "SAVE LOADED SUCCESSFULLY\n"..
+        "File: "..tostring(filename).."\n"..
+        "cl: "..tostring(cl).."\n"..
+        "chapter: "..tostring(chapter)
+    )
+
+    return true
 end
 
 function savedatainfo(save)
