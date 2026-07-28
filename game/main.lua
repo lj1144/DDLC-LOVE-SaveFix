@@ -8,7 +8,10 @@ if g_system == 'Switch' then
 	joysticks = love.joystick.getJoysticks()
 	joystick = joysticks[1]
 end
-love.math.setRandomSeed(os.time())
+if love.math and love.math.setRandomSeed then
+    love.math.setRandomSeed(os.time())
+end
+
 math.randomseed(os.time())
 math.random()
 math.random()
